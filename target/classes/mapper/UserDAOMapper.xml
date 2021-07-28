@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zale.dao.UserDAO">
+
+
+    <select id="findByUserName" parameterType="string" resultType="com.zale.entity.User">
+        select id,username,password,salt from t_user
+        where username = #{username}
+    </select>
+
+    <insert id="save" parameterType="com.zale.entity.User" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user values(#{id},#{username},#{password},#{salt})
+    </insert>
+
+
+    <resultMap id="userMap" type="com.zale.entity.User">
+        <id column="uid" property="id" />
+        <result column="username" property="username" />
+
+        <collection property="roles" javaType="list" ofType="com.zale.entity.Role">
+            <id column="id" property="id" />
+            <result column="rname" property="name" />
+        </collection>
+    </resultMap>
+
+    <select id="findRolesByUserName" parameterType="string" resultMap="userMap">
+        SELECT u.id uid,u.username,r.id,r.NAME rname
+        FROM t_user u
+        LEFT JOIN t_user_role ur
+        ON u.id=ur.userid
+        LEFT JOIN t_role r
+        ON ur.roleid=r.id
+        WHERE u.username=#{username}
+    </select>
+
+
+
+</mapper>
